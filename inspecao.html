@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Inspeção de Veículos</title>
+
+<style>
+
+body{
+    background:#f3f2f1;
+    font-family:'Segoe UI',sans-serif;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    background:white;
+    max-width:700px;
+    margin:auto;
+    padding:30px;
+    border-radius:16px;
+    box-shadow:0 5px 15px rgba(0,0,0,.1);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+label{
+    display:block;
+    margin-top:20px;
+    font-weight:600;
+}
+
+input[type=text],
+input[type=number],
+textarea{
+    width:100%;
+    padding:12px;
+    margin-top:5px;
+    border:1px solid #d0d0d0;
+    border-radius:8px;
+    box-sizing:border-box;
+}
+
+textarea{
+    resize:vertical;
+    min-height:80px;
+}
+
+.radio-group{
+    margin-top:10px;
+}
+
+.radio-group label{
+    display:inline-block;
+    margin-right:20px;
+    font-weight:normal;
+}
+
+button{
+    width:100%;
+    margin-top:25px;
+    padding:15px;
+    border:none;
+    border-radius:8px;
+    background:#FFD100;
+    color:black;
+    font-weight:bold;
+    font-size:16px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#e6bc00;
+}
+
+#blocoAvaria{
+    display:none;
+}
+
+.obrigatorio{
+    color:red;
+}
+
+.sucesso{
+    text-align:center;
+}
+
+</style>
+https://unpkg.com/html5-qrcodescript>
+</head>
+
+<body>
+
+<div class="container" id="formulario">
+
+<h1>🚗 Inspeção de Veículos</h1>
+
+<label>
+Chassi <span class="obrigatorio">*</span>
+</label>
+
+<input
+type="text"
+id="chassi"
+placeholder="Informe ou escaneie o chassi">
+
+<button type="button" onclick="iniciarScanner()">
+📷 Escanear QR Code
+</button>
+<div id="reader" style="margin-top:15px;"></div>
+
+<label>
+Veículo possui alguma avaria?
+<span class="obrigatorio">*</span>
+</label>
+
+<div class="radio-group">
+
+<label>
+<input
+type="radio"
+name="avaria"
+value="Sim"
+onchange="mostrarAvaria()">
+Sim
+</label>
+
+<label>
+<input
+type="radio"
+name="avaria"
+value="Não"
+onchange="mostrarAvaria()">
+Não
+</label>
+
+</div>
+
+<div id="blocoAvaria">
+
+<label>
+Se sim, qual/local?
+<span class="obrigatorio">*</span>
+</label>
+
+<textarea
+id="descricao"
+placeholder="Descreva a avaria"></textarea>
+
+<label>
+Foto da Avaria
+<span class="obrigatorio">*</span>
+</label>
+
+<input
+type="file"
+id="fotoAvaria"
+accept="image/*">
+
+</div>
+
+<label>
+KM do veículo
+<span class="obrigatorio">*</span>
+</label>
+
+<input
+type="number"
+id="km"
+placeholder="Ex: 12345">
+
+<label>
+Foto do KM
+<span class="obrigatorio">*</span>
+</label>
+
+<input
+type="file"
+id="fotoKm"
+accept="image/*">
+
+<button onclick="validarFormulario()">
+
+✅ Enviar Inspeção
+
+</button>
+
+</div>
+
+<script>
+
+function mostrarAvaria(){
+
+const selecionado =
+document.querySelector('input[name="avaria"]:checked');
+
+const bloco =
+document.getElementById("blocoAvaria");
+
+if(
+selecionado &&
+selecionado.value === "Sim"
+){
+    bloco.style.display = "block";
+}
+else{
+    bloco.style.display = "none";
+}
+
+}
+function iniciarScanner(){
+
+    const html5QrCode = new Html5Qrcode("reader");
+
+    html5QrCode.start(
+        { facingMode: "environment" },
+        {
+            fps: 10,
+            qrbox: 250
+        },
+        function(decodedText){
+
+            document.getElementById("chassi").value = decodedText;
+
+            html5QrCode.stop();
+
+            document.getElementById("reader").innerHTML = "";
+
+            alert("QR Code lido com sucesso!");
+
+        },
+        function(errorMessage){
+
+        }
+    );
+
+}
+function validarFormulario(){
+
+const chassi =
+document.getElementById("chassi").value;
+
+const km =
+document.getElementById("km").value;
+
+const fotoKm =
+document.getElementById("fotoKm").files.length;
+
+const avaria =
+document.querySelector(
+'input[name="avaria"]:checked'
+);
+
+if(!chassi){
+
+alert("Informe o Chassi.");
+
+return;
+
+}
+
+if(!avaria){
+
+alert("Selecione Sim ou Não para avaria.");
+
+return;
+
+}
+
+if(avaria.value === "Sim"){
+
+const descricao =
+document.getElementById("descricao").value;
+
+const fotoAvaria =
+document.getElementById("fotoAvaria").files.length;
+
+if(!descricao){
+
+alert("Informe a descrição da avaria.");
+
+return;
+
+}
+
+if(!fotoAvaria){
+
+alert("Adicione a foto da avaria.");
+
+return;
+
+}
+
+}
+
+if(!km){
+
+alert("Informe o KM.");
+
+return;
+
+}
+
+if(!fotoKm){
+
+alert("Adicione a foto do KM.");
+
+return;
+
+}
+
+document.getElementById("formulario").innerHTML = `
+
+<div class="sucesso">
+
+<h1>✅ Registro enviado!</h1>
+
+<p>
+A inspeção foi registrada com sucesso.
+</p>
+
+<button onclick="location.reload()">
+Nova Inspeção
+</button>
+
+</div>
+
+`;
+
+}
+
+</script>
+
+</body>
+
+</html>
